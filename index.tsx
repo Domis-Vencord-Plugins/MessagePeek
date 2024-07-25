@@ -11,8 +11,8 @@ export default definePlugin({
         {
             find: /avatar:[^],decorators:[^],name:[^],subText:[^],/,
             replacement: {
-                match: /(?<=decorators:([^])[^]*)(children:\[[^]*?null)\]/,
-                replace: "$2,$self.renderMessagePeek({ user: $1?.[0]?.props?.children?.props?.user })]"
+                match: /(?<=avatar:([^])[^]*)(?<=decorators:([^])[^]*)(children:\[[^]*?null)\]/,
+                replace: "$3,$self.renderMessagePeek({ DM: $2?.[0]?.props?.children?.props?.user || $1?.props?.src || $1?.props?.recipients })]"
             }
         }
     ],
