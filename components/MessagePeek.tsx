@@ -1,5 +1,6 @@
 import { findByPropsLazy } from "@webpack";
 import { MessageStore, Parser, TooltipContainer, useStateFromStores } from "@webpack/common";
+import { Message } from "discord-types/general";
 import { MessagePeekProps } from "../types";
 import "./styles.css";
 
@@ -10,17 +11,16 @@ export default function MessagePeek(props: MessagePeekProps) {
     const { channel, channel_url } = props;
     if (!channel && !channel_url) return null;
 
-    let channelId = "";
-    if (channel) channelId = channel.id;
-    else channelId = channel_url.split("/").pop() as string;
-
-    if (!channelId) return null;
-    const lastMessage = useStateFromStores([MessageStore], () => MessageStore.getMessages(channelId)?.last());
+    let channelId = channel ? channel.id : channel_url.split("/").pop() as string;
+    
+    const lastMessage: Message = useStateFromStores([MessageStore], () => MessageStore.getMessages(channelId)?.last());
     if (!lastMessage) return null;
+    const attachmentCount = lastMessage.attachments.length;
     const content =
         lastMessage.content ||
         lastMessage.embeds?.[0]?.rawDescription ||
-        lastMessage.attachments.length && `${lastMessage.attachments.length} attachment${lastMessage.attachments.length > 1 ? "s" : ""}`;
+        lastMessage.stickerItems.length && "Sticker" ||
+        attachmentCount && `${attachmentCount} attachment${attachmentCount > 1 ? "s" : ""}`;
     if (!content) return null;
 
     return (

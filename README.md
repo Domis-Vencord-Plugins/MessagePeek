@@ -9,4 +9,6 @@ If you don't know how to install custom Plugins, follow [this Guide](https://doc
 
 ## Preview
 
-![image](https://github.com/Domis-Vencord-Plugins/MessagePeek/raw/main/image.png)
+| ![MessagePeek in DMs](./previews/preview_dm.png) | ![MessagePeek in Guild Channel](./previews/preview_guild.png) |
+| ------------------------------------------------ | ------------------------------------------------------------- |
+|                MessagePeek in DMs                |                  MessagePeek in Guild Channel                 |
