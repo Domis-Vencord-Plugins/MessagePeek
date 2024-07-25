@@ -1,5 +1,6 @@
-import { User } from "discord-types/general";
+import { Channel, User } from "discord-types/general";
 
 export interface MessagePeekProps {
-    DM: User | string | string[];
+    channel: Channel;
+    channel_url: string;
 }

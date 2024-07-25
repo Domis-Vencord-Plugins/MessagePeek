@@ -9,10 +9,29 @@ export default definePlugin({
     authors: [{ name: "domi.btnr", id: 354191516979429376n }],
     patches: [
         {
-            find: /avatar:[^],decorators:[^],name:[^],subText:[^],/,
+            // DMs
+            find: /let{className:[^],focusProps:[^],...[^]}=[^];return\(/,
             replacement: {
-                match: /(?<=avatar:([^])[^]*)(?<=decorators:([^])[^]*)(children:\[[^]*?null)\]/,
-                replace: "$3,$self.renderMessagePeek({ DM: $2?.[0]?.props?.children?.props?.user || $1?.props?.src || $1?.props?.recipients })]"
+                match: /(?<=\.\.\.([^])[^]*)}=[^];/,
+                replace: `$&
+                    if ($1.children?.props?.children?.[0]?.props?.children?.props)
+                        $1.children.props.children[0].props.children.props.subText = [
+                            $1.children.props.children[0].props.children.props?.subText,
+                            $self.renderMessagePeek({ channel_url: $1.children.props.children[0].props.to })
+                        ];
+                `.replace(/\s+/g, "")
+            }
+        },
+        {
+            // Guild channels
+            find: /{href:[^],children:[^],onClick:[^],onKeyPress:[^],focusProps:[^],/,
+            replacement: {
+                match: /(?<=children:([^])[^]*)}\);/,
+                replace: `$&
+                    $1[0].props.children[1].props.children=[
+                        $1[0].props.children[1].props.children,
+                        $self.renderMessagePeek({ channel: $1[0].props.children[0].props.channel })
+                    ];`.replace(/\s+/g, "")
             }
         }
     ],

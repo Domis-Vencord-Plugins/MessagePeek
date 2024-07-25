@@ -1,35 +1,18 @@
 import { findByPropsLazy } from "@webpack";
-import { ChannelStore, MessageStore, TooltipContainer, useStateFromStores } from "@webpack/common";
+import { MessageStore, Parser, TooltipContainer, useStateFromStores } from "@webpack/common";
 import { MessagePeekProps } from "../types";
 import "./styles.css";
 
 const ChannelWrapperStyles = findByPropsLazy("muted", "subText");
 const ChannelStyles = findByPropsLazy("closeButton", "subtext");
 
-// Could lead to wrong group if multiple groups with same members
-const getGroupFromRecipients = (recipients: string[]) => {
-    const groups = ChannelStore.getSortedPrivateChannels().filter(c => c.isGroupDM());
-    return groups.find(g => g.recipients.every(r => recipients.includes(r)));
-};
-
 export default function MessagePeek(props: MessagePeekProps) {
-    const { DM } = props;
-    if (!DM) return null;
+    const { channel, channel_url } = props;
+    if (!channel && !channel_url) return null;
 
     let channelId = "";
-    switch (typeof DM) {
-        case "string":
-            [, channelId] = DM.match(/avatars|channel-icons\/([^\/]*)/) || [];
-            break;
-        case "object":
-            if (Array.isArray(DM)) {
-                const group = getGroupFromRecipients(DM);
-                if (group) channelId = group.id;
-            } else {
-                channelId = ChannelStore.getDMFromUserId(DM.id);
-                break;
-            }
-    }
+    if (channel) channelId = channel.id;
+    else channelId = channel_url.split("/").pop() as string;
 
     if (!channelId) return null;
     const lastMessage = useStateFromStores([MessageStore], () => MessageStore.getMessages(channelId)?.last());
@@ -45,9 +28,10 @@ export default function MessagePeek(props: MessagePeekProps) {
             className={ChannelWrapperStyles.subText}
             style={{ marginBottom: "2px" }}
         >
-            <TooltipContainer text={content.length > 128 ? `${content.slice(0, 128).trim()}...` : content}>
+            <TooltipContainer text={content.length > 256 ? Parser.parse(content.slice(0, 256).trim()) : Parser.parse(content)}>
                 <div className={ChannelStyles.subtext}>
-                    {`${lastMessage.author["globalName"] || lastMessage.author.username}: ${content}`}
+                    {`${lastMessage.author["globalName"] || lastMessage.author.username}: `}
+                    {Parser.parseInlineReply(content)}
                 </div>
             </TooltipContainer>
         </div>
