@@ -10,16 +10,10 @@ export default definePlugin({
     patches: [
         {
             // DMs
-            find: /let{className:[^],focusProps:[^],...[^]}=[^];return\(/,
+            find: /subText:\i\.isSystemDM\(\)\?.+?withDisplayNameStyles:/,
             replacement: {
-                match: /(?<=\.\.\.([^])[^]*)}=[^];/,
-                replace: `$&
-                    if ($1.children?.props?.children?.[0]?.props?.children?.props)
-                        $1.children.props.children[0].props.children.props.subText = [
-                            $1.children.props.children[0].props.children.props?.subText,
-                            $self.renderMessagePeek({ channel_url: $1.children.props.children[0].props.to })
-                        ];
-                `.replace(/\s+/g, "")
+                match: /subText:([^]*?:null)(?=,name:)/,
+                replace: `subText:[$1,$self.renderMessagePeek({channel:arguments[0].channel})]`.replace(/\s+/g, "")
             }
         },
         {

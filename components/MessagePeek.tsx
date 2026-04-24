@@ -1,11 +1,12 @@
-import { findByPropsLazy } from "@webpack";
-import { MessageStore, Parser, TooltipContainer, useStateFromStores } from "@webpack/common";
-import { Message } from "discord-types/general";
+import { findCssClassesLazy } from "@webpack";
+import { MessageStore, Parser, useStateFromStores } from "@webpack/common";
 import { MessagePeekProps } from "../types";
+import { TooltipContainer } from "@components/TooltipContainer";
+import { Message } from "@vencord/discord-types";
 import "./styles.css";
 
-const ChannelWrapperStyles = findByPropsLazy("muted", "subText");
-const ChannelStyles = findByPropsLazy("closeButton", "subtext");
+const ChannelWrapperStyles = findCssClassesLazy("nameAndDecorators", "subText")
+const ChannelStyles = findCssClassesLazy("closeButton", "subtext");
 
 export default function MessagePeek(props: MessagePeekProps) {
     const { channel, channel_url } = props;
